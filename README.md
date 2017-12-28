@@ -1,7 +1,7 @@
 # practica-final-isi
 Practica final realizada para la asignatura de Ing de sistemas de informacion
 
-Resumen: 
+
 # Lista de requisitos:
 	- Vamos a tener varios ficheros de informacion de peliculas (datos: fecha de la pelicula, actores, canciones , subconjuntos de 18+ 12+..)
 	- cargar la informacion en un grafo para realizar busquedas para saber que relaciones pueden tener esos actores, además podemos consultar medidas de distancia entre actores en el grafo -- queries sobre la base de datos mediante el software
@@ -13,15 +13,17 @@ Resumen:
 
   
 # Formato sobre los datos de las peliculas : 
+
+Formato de texto : Nombre_peli/Actor1/actor2/....
+                   Nombre_peli2/Actor1/actor2/....
   
-  Formato de texto :
-     Nombre_peli/Actor1/actor2/....
-     Nombre_peli2/Actor1/actor2/....
-  tenemos ficheros con subconjuntos de peliculas - de donde sacaremos los generos de esas peliculas.
-  todas -- nombrepeli1/nombrepeli2....
-  18+   -- nombrepeli1/nombrepeli2....
-  13+   -- nombrepeli1/nombrepeli2....
-  Podemos parsear estos datos a traves de json y  realizar las sentencias sql desde la api
+Tenemos ficheros con subconjuntos de peliculas - de donde sacaremos los generos de esas peliculas.
+  
+    todas -- nombrepeli1/nombrepeli2....
+    18+   -- nombrepeli1/nombrepeli2....
+    13+   -- nombrepeli1/nombrepeli2....
+
+Podemos parsear estos datos a traves de json y  realizar las sentencias sql desde la api
 
 Para las preguntas sobre las queries podemos realizar un formulario o como si fuera una apiREST
 
