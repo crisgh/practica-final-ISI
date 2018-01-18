@@ -1,3 +1,5 @@
+package urjc.isi.practica_final_isi;
+
 /******************************************************************************
  *  Compilation:  javac StdOut.java
  *  Execution:    java StdOut
