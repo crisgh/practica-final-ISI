@@ -1,22 +1,23 @@
 package urjc.isi.practica_final_isi;
-import static spark.Spark.*;
-import spark.Request;
-import spark.Response;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.PreparedStatement;
-
-import java.util.StringTokenizer;
-
-import javax.servlet.MultipartConfigElement;
+import static spark.Spark.get;
+import static spark.Spark.port;
+import static spark.Spark.post;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.StringTokenizer;
+
+import javax.servlet.MultipartConfigElement;
+
+import spark.Request;
+import spark.Response;
 
 // This code is quite dirty. Use it just as a hello world example 
 // to learn how to use JDBC and SparkJava to upload a file, store 
