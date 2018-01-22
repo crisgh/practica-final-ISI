@@ -59,6 +59,14 @@ public class Graph {
      */
     public Graph(String filename, String delimiter, String peticion) {
         st = new ST<String, SET<String>>();
+        In in = new In(filename);
+        while (in.hasNextLine()) {
+            String line = in.readLine();
+            String[] names = line.split(delimiter);
+            for (int i = 1; i < names.length; i++) {
+                addEdge(names[0], names[i]);
+            }
+        }
     }
 
    /**

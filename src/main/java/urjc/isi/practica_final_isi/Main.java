@@ -53,7 +53,8 @@ public class Main {
 					+ "Puede que haya introducido mal alguno de los elementos.";
 		}
 		System.out.println(result);
-    	insert_distancia(connection,element1,element2,result);
+    	//insert_distancia(connection,element1,element2,result);
+		
 		return result;
 }
     // Used to illustrate how to route requests to methods instead of
@@ -123,7 +124,7 @@ public class Main {
     		pstmt.setString(1, peti1);
     		pstmt.setString(2, peti2);
     	//	pstmt.setNString(3, graph);
-    		pstmt.setString(3, dist);
+    		pstmt.setString(4, dist);
     		pstmt.executeUpdate();
     	} catch (SQLException e) {
     		System.out.println(e.getMessage());
@@ -142,13 +143,19 @@ public class Main {
     	}
     }
     public static String doDistance(Request request, Response response) throws ClassNotFoundException, URISyntaxException {
-    	String filePath = "data/imdb-data/cast.all.2.txt";
+    	
+    	System.out.println("entro");
+    	String filePath = "data/other-data/tinyMovies.txt";
     	String delimiter = "/";
     	Graph graph = new Graph(filePath, delimiter);
     	String element1 = request.queryParams("Element1");
     	String element2 = request.queryParams("Element2");
     	String distance = distanceBetweenElements(graph, element1, element2);
-    	return distance;
+    	System.out.println(distance);
+
+    	return select (connection, request.params(":table"), 
+                request.params(":Distance"));
+    	//return distance;
     }
 
     public static String Formu_Distancia(Request request, Response response) throws ClassNotFoundException, URISyntaxException {
@@ -189,7 +196,9 @@ public class Main {
 	// expression instead, as illustrated in the next sentence.
 	get("/:table/:film", Main::doSelect);
 	get("/Distancia", Main::Formu_Distancia);
+	
 	post("/Distancia", Main::Formu_Distancia);
+	
 	post("/Distancia", Main::doDistance);
 	// In this case we use a Java 8 Lambda function to process the
 	// GET /upload_films HTTP request, and we return a form
@@ -203,11 +212,11 @@ public class Main {
 		String pprin = "<body style=\"background-color:rgba(0, 255, 228, 0.26);\">"
 				+ " <center><h1 style=\"color:#ff006c;\">PRACTICA FINAL ISI</h1> "
 				+ "<h2>Primero se cargan los archivos y luego podemos realizar las siguientes acciones: </h2><ul>"
-				+ "<li>Para cargar archivos:------------------------>/upload_films/(categoría)</li>"
-				+ "<li>Buscar los actores de una película--------->/vecinos/(Película)</li>"
-				+ "<li>Buscar las películas que tiene un actor---->/vecinos/(Actor)</li>"
-				+ "<li>Buscar la distancia entre dos elementos--->/distancia/(Elemento1)/(Elemento2)</li>"
-				+ "<li>Buscar la categoría de una pelicula-------->/categoria/(Película)</li></ul></center></body>";
+				+ "<li>Para cargar archivos:------------------------>/upload_films/</li>"
+				//+ "<li>Buscar los actores de una película--------->/vecinos/(Película)</li>"
+				+ "<li>Buscar las películas que tiene un actor---->/vecinos</li>"
+				+ "<li>Buscar la distancia entre dos elementos--->/Distancia</li>"
+				+ /*"<li>Buscar la categoría de una pelicula-------->/categoria/(Película)</li>*/"</ul></center></body>";
 		System.out.println("Pag principal");
 		return pprin;
 }); 
