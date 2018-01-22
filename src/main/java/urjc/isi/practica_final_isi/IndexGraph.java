@@ -26,22 +26,40 @@ package urjc.isi.practica_final_isi;
 
 public class IndexGraph {
 
-    public static void main(String[] args) {
-
-        // read in the graph from a file
-        String filename = args[0];
+    public static String main(String[] args) {
+    	String filename = args[0];
         String delimiter = args[1];
-        Graph G = new Graph(filename, delimiter);
+        String peticion = args[2];
+        String respuesta = "";
+        Graph G = new Graph(filename, delimiter,peticion);
 
         // read a vertex and print its neighbors
         while (!StdIn.isEmpty()) {
-            String v = StdIn.readLine();
-            if (G.hasVertex(v)) {
-                for (String w : G.adjacentTo(v)) {
-                    StdOut.println("  " + w);
+         //   String v = StdIn.readLine();
+            if (G.hasVertex(peticion)) {
+                for (String w : G.adjacentTo(peticion)) {
+                	respuesta += "  " + w + "\n";
                 }
             }
         }
+		return respuesta;
+
     }
 
+	public static String index(String filename, String delimiter, String peticion) {
+		String respuesta = "";
+        Graph G = new Graph(filename, delimiter,peticion);
+
+        // read a vertex and print its neighbors
+        while (!StdIn.isEmpty()) {
+         //   String v = StdIn.readLine();
+            if (G.hasVertex(peticion)) {
+                for (String w : G.adjacentTo(peticion)) {
+                	respuesta += "  " + w + "\n";
+                }
+            }
+        }
+		return respuesta;
+		
+	}
 }

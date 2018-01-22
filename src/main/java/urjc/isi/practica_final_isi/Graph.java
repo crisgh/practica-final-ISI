@@ -53,8 +53,11 @@ public class Graph {
 
    /**
      * Initializes an empty graph with no vertices or edges.
+ * @param peticion 
+ * @param delimiter 
+ * @param filename 
      */
-    public Graph() {
+    public Graph(String filename, String delimiter, String peticion) {
         st = new ST<String, SET<String>>();
     }
 
@@ -95,7 +98,7 @@ public class Graph {
     }
 
     // throw an exception if v is not a vertex
-    private void validateVertex(String v) {
+    void validateVertex(String v) {
         if (!hasVertex(v)) throw new IllegalArgumentException(v + " is not a vertex");
     }
 
@@ -206,7 +209,7 @@ public class Graph {
     public static void main(String[] args) {
 
         // create graph
-        Graph graph = new Graph();
+        Graph graph = new Graph(null, null);
         while (!StdIn.isEmpty()) {
             String v = StdIn.readString();
             String w = StdIn.readString();

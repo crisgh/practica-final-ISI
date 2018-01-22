@@ -6,6 +6,7 @@ import static spark.Spark.post;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -27,7 +28,34 @@ public class Main {
     // Connection to the SQLite database. Used by insert and select methods.
     // Initialized in main
     private static Connection connection;
-
+    
+    public static String distanceBetweenElements(Graph graph,String element1,String element2) {
+		if (element1 == null || element2 == null || graph.V() == 0) {
+			throw new NullPointerException("Element null");
+		}
+		String result = new String("");
+		try {
+			PathFinder pf = new PathFinder(graph, element1);
+			graph.validateVertex(element2);
+			if (pf.distanceTo(element2) != Integer.MAX_VALUE) {			
+				String ruta = new String("");
+				for (String v : pf.pathTo(element2)) {
+					ruta += v + " -> ";
+				}        
+				char[] ruta1 = ruta.toCharArray();
+				result = new String(ruta1, 0, ruta1.length-4);
+				result += "<br>Distancia: " + pf.distanceTo(element2);
+			} else {
+				result += "Distancia: 0";
+			}
+		} catch (IllegalArgumentException e) {
+			result = "No se han encontrado resultados para su búsqueda.</br>"
+					+ "Puede que haya introducido mal alguno de los elementos.";
+		}
+		System.out.println(result);
+    	insert_distancia(connection,element1,element2,result);
+		return result;
+}
     // Used to illustrate how to route requests to methods instead of
     // using lambda expressions
     public static String doSelect(Request request, Response response) {
@@ -71,9 +99,75 @@ public class Main {
 		pstmt.executeUpdate();
 	    } catch (SQLException e) {
 	    System.out.println(e.getMessage());
-	}
+	    }
+    }
+    
+    public static void insert_actores_vecinos(Connection conn, String peticion, String vecino, String categoria) {
+        	
+        	String sql = "INSERT INTO Tabla_vecinos(peti, veci, categ) VALUES(?,?,?)";
+
+        	try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        		pstmt.setString(1, peticion);
+        		pstmt.setString(2, vecino);
+        		pstmt.setString(3, categoria);
+        		pstmt.executeUpdate();
+        	    } catch (SQLException e) {
+        	    System.out.println(e.getMessage());
+        	}
+    }
+    
+    public static void insert_distancia(Connection conn, String peti1, String peti2, String dist) {
+    	String sql = "INSERT INTO Tabla_distancia(peti1, peti2,saltos,dist) VALUES(?,?,?,?)";
+
+    	try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    		pstmt.setString(1, peti1);
+    		pstmt.setString(2, peti2);
+    	//	pstmt.setNString(3, graph);
+    		pstmt.setString(3, dist);
+    		pstmt.executeUpdate();
+    	} catch (SQLException e) {
+    		System.out.println(e.getMessage());
+    	}
     }
 
+    public static void insert_categoria(Connection conn, String categoria, String pelicula) {
+    	String sql = "INSERT INTO Tabla_categoria(categoria,pelicula) VALUES(?,?)";
+
+    	try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    		pstmt.setString(1, categoria);
+    		pstmt.setString(2, pelicula);
+    		pstmt.executeUpdate();
+    	} catch (SQLException e) {
+    		System.out.println(e.getMessage());
+    	}
+    }
+    public static String doDistance(Request request, Response response) throws ClassNotFoundException, URISyntaxException {
+    	String filePath = "data/imdb-data/cast.all.2.txt";
+    	String delimiter = "/";
+    	Graph graph = new Graph(filePath, delimiter);
+    	String element1 = request.queryParams("Element1");
+    	String element2 = request.queryParams("Element2");
+    	String distance = distanceBetweenElements(graph, element1, element2);
+    	return distance;
+    }
+
+    public static String Formu_Distancia(Request request, Response response) throws ClassNotFoundException, URISyntaxException {
+		String body = "<form action='/Distancia' method='post'>" +
+					  	  "<div>" + 
+					  	  	  "<label for='name'>Actor o película: </label>" +
+					  	  	  "<input type='text' id='name' name='1'/>" +
+					  	  "</div>" +
+					  	  "<div>" + 
+					  	  	  "<label for='name'>Actor o película: </label>" +
+					  	  	  "<input type='text' id='name' name='2'/>" +
+					  	  "</div>" +
+					  	  "<div class='button'>" +
+					  	  	  "<button type='submit'>DISTANCIA!</button>" +
+					  	  "</div>" +
+					  "</form>";
+		return body;
+}
+    
     public static void main(String[] args) throws 
 	ClassNotFoundException, SQLException {
 	port(getHerokuAssignedPort());
@@ -94,7 +188,9 @@ public class Main {
 	// query. It could've been programmed using a lambda
 	// expression instead, as illustrated in the next sentence.
 	get("/:table/:film", Main::doSelect);
-
+	get("/Distancia", Main::Formu_Distancia);
+	post("/Distancia", Main::Formu_Distancia);
+	post("/Distancia", Main::doDistance);
 	// In this case we use a Java 8 Lambda function to process the
 	// GET /upload_films HTTP request, and we return a form
 	get("/upload_films", (req, res) -> 
@@ -103,7 +199,18 @@ public class Main {
 	    + "    <button>Upload file</button>" + "</form>");
 	// You must use the name "uploaded_films_file" in the call to
 	// getPart to retrieve the uploaded file. See next call:
-
+	get("/", (req, res) -> {
+		String pprin = "<body style=\"background-color:rgba(0, 255, 228, 0.26);\">"
+				+ " <center><h1 style=\"color:#ff006c;\">PRACTICA FINAL ISI</h1> "
+				+ "<h2>Primero se cargan los archivos y luego podemos realizar las siguientes acciones: </h2><ul>"
+				+ "<li>Para cargar archivos:------------------------>/upload_films/(categoría)</li>"
+				+ "<li>Buscar los actores de una película--------->/vecinos/(Película)</li>"
+				+ "<li>Buscar las películas que tiene un actor---->/vecinos/(Actor)</li>"
+				+ "<li>Buscar la distancia entre dos elementos--->/distancia/(Elemento1)/(Elemento2)</li>"
+				+ "<li>Buscar la categoría de una pelicula-------->/categoria/(Película)</li></ul></center></body>";
+		System.out.println("Pag principal");
+		return pprin;
+}); 
 
 	// Retrieves the file uploaded through the /upload_films HTML form
 	// Creates table and stores uploaded file in a two-columns table
