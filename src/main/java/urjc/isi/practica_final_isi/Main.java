@@ -257,8 +257,8 @@ public class Main {
 					+ "<li>Para cargar archivos:--------------------------------->/upload_films/</li>"
 					+ "<li>Buscar los actores de una película------------>/FormuVecinos</li>"
 					+ "<li>Buscar las películas que tiene un actor ---->/FormuVecinos</li>"
-					+ "<li>Buscar la distancia entre dos elementos--->/FormDistancia</li>"
-					+ /*"<li>Buscar la categoría de una pelicula-------->/categoria/(Película)</li>*/"</center></body>";
+					+ "<li>Buscar la distancia entre dos elementos--->/FormuDistancia</li>"
+					+ "</center></body>";
 			System.out.println("Pag principal");
 			return pprin;
 		}); 
