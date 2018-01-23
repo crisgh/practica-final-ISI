@@ -83,8 +83,13 @@ public class AppTest {
 		actor1 = null;
 		assertEquals(result, Main.Vecinos(graph, actor1));
 	}
-	
-	
+
+	@Test()
+	public void TestVecinos_NOFOUND() {
+		String result = "No se han encontrado resultados para 'Hill, Marianna'";
+		graph = new Graph();
+		assertEquals(result, Main.Vecinos(graph, "Hill, Marianna"));
+	}
 
 	public void testApp()
 	{
