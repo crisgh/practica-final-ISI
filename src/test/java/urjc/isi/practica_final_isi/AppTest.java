@@ -93,7 +93,7 @@ public class AppTest {
 
 	//Vecinos null
 	@Test(expected= NullPointerException.class)
-	public void doAInB1() throws ClassNotFoundException, URISyntaxException, SQLException {
+	public void doVecinos() throws ClassNotFoundException, URISyntaxException, SQLException {
 		Main.doVecinos(request, response);
 	}
 
