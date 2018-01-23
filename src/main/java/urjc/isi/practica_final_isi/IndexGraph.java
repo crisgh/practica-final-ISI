@@ -31,11 +31,11 @@ public class IndexGraph {
         String delimiter = args[1];
         String peticion = args[2];
         String respuesta = "";
-        Graph G = new Graph(filename, delimiter,peticion);
+        Graph G = new Graph(filename, delimiter);
 
         // read a vertex and print its neighbors
         while (!StdIn.isEmpty()) {
-         //   String v = StdIn.readLine();
+            String v = StdIn.readLine();
             if (G.hasVertex(peticion)) {
                 for (String w : G.adjacentTo(peticion)) {
                 	respuesta += "  " + w + "\n";
@@ -48,11 +48,11 @@ public class IndexGraph {
 
 	public static String index(String filename, String delimiter, String peticion) {
 		String respuesta = "";
-        Graph G = new Graph(filename, delimiter,peticion);
+        Graph G = new Graph(filename, delimiter);
 
         // read a vertex and print its neighbors
         while (!StdIn.isEmpty()) {
-         //   String v = StdIn.readLine();
+            String v = StdIn.readLine();
             if (G.hasVertex(peticion)) {
                 for (String w : G.adjacentTo(peticion)) {
                 	respuesta += "  " + w + "\n";

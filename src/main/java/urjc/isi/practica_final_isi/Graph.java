@@ -1,6 +1,7 @@
 package urjc.isi.practica_final_isi;
 
 /******************************************************************************
+ /******************************************************************************
  *  Compilation:  javac Graph.java
  *  Execution:    java Graph < input.txt
  *  Dependencies: ST.java SET.java In.java StdOut.java
@@ -46,27 +47,16 @@ package urjc.isi.practica_final_isi;
 public class Graph {
 
     // symbol table: key = string vertex, value = set of neighboring vertices
-    private ST<String, SET<String>> st;
+    ST<String, SET<String>> st;
 
     // number of edges
     private int E;
 
    /**
      * Initializes an empty graph with no vertices or edges.
- * @param peticion 
- * @param delimiter 
- * @param filename 
      */
-    public Graph(String filename, String delimiter, String peticion) {
+    public Graph() {
         st = new ST<String, SET<String>>();
-        In in = new In(filename);
-        while (in.hasNextLine()) {
-            String line = in.readLine();
-            String[] names = line.split(delimiter);
-            for (int i = 1; i < names.length; i++) {
-                addEdge(names[0], names[i]);
-            }
-        }
     }
 
    /**
@@ -106,7 +96,7 @@ public class Graph {
     }
 
     // throw an exception if v is not a vertex
-    void validateVertex(String v) {
+    public void validateVertex(String v) {
         if (!hasVertex(v)) throw new IllegalArgumentException(v + " is not a vertex");
     }
 
@@ -217,7 +207,7 @@ public class Graph {
     public static void main(String[] args) {
 
         // create graph
-        Graph graph = new Graph(null, null);
+        Graph graph = new Graph();
         while (!StdIn.isEmpty()) {
             String v = StdIn.readString();
             String w = StdIn.readString();

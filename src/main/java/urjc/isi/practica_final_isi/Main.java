@@ -4,6 +4,7 @@ import static spark.Spark.port;
 import static spark.Spark.post;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
@@ -16,6 +17,7 @@ import java.sql.Statement;
 import java.util.StringTokenizer;
 
 import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletException;
 
 import spark.Request;
 import spark.Response;
@@ -29,67 +31,110 @@ public class Main {
     // Initialized in main
     private static Connection connection;
     
-    public static String distanceBetweenElements(Graph graph,String element1,String element2) {
-		if (element1 == null || element2 == null || graph.V() == 0) {
-			throw new NullPointerException("Element null");
-		}
-		String result = new String("");
-		try {
-			PathFinder pf = new PathFinder(graph, element1);
-			graph.validateVertex(element2);
-			if (pf.distanceTo(element2) != Integer.MAX_VALUE) {			
-				String ruta = new String("");
-				for (String v : pf.pathTo(element2)) {
-					ruta += v + " -> ";
-				}        
-				char[] ruta1 = ruta.toCharArray();
-				result = new String(ruta1, 0, ruta1.length-4);
-				result += "<br>Distancia: " + pf.distanceTo(element2);
-			} else {
-				result += "Distancia: 0";
-			}
-		} catch (IllegalArgumentException e) {
-			result = "No se han encontrado resultados para su búsqueda.</br>"
-					+ "Puede que haya introducido mal alguno de los elementos.";
-		}
-		System.out.println(result);
-    	//insert_distancia(connection,element1,element2,result);
-		
-		return result;
-}
+    public static String distanceElements(Graph graph,String element1,String element2) {
+    	if (element1 == null || element2 == null || graph.V() == 0) {
+    		System.out.println("aqui");
+    		throw new NullPointerException("Element null");
+    	}
+    	String result = new String("");
+    	try {
+    		PathFinder pf = new PathFinder(graph, element1);
+    		graph.validateVertex(element2);
+    		if (pf.distanceTo(element2) != Integer.MAX_VALUE) {			
+    			String ruta = new String("");
+    			for (String v : pf.pathTo(element2)) {
+    				ruta += v + " -> ";
+    			}        
+    			char[] ruta1 = ruta.toCharArray();
+    			result = new String(ruta1, 0, ruta1.length-4);
+    			result += "<br>Distancia: " + pf.distanceTo(element2);
+    		} else {
+    			result += "Distancia: 0";
+    		}
+    	} catch (IllegalArgumentException e) {
+    		result = "No se han encontrado resultados para su búsqueda.</br>"
+    				+ "Puede que haya introducido mal alguno de los elementos.";
+    	}
+    	return result;
+    }
+    
+    
+    //Para saber si esta un elemento en otro
+    public static String Vecinos(Graph graph, String element) {
+    	if (element == null) {
+    		throw new NullPointerException("Elemento nulo, hay que pasar un paámetro de búsqueda");
+    	}
+
+    	String result = new String("");
+    	try {
+    		for (String v:graph.adjacentTo(element)) {
+
+    			if(graph.st.contains(v)) {
+    				result += v + "</br>";
+    			}
+    		}
+    	}catch (IllegalArgumentException e) {
+    		result += "No se han encontrado resultados para '" + element + "'";
+    	}
+    	return result;
+    }
+    
+    
+    
     // Used to illustrate how to route requests to methods instead of
     // using lambda expressions
     public static String doSelect(Request request, Response response) {
 	return select (connection, request.params(":table"), 
                                    request.params(":film"));
     }
-
+    
+    
+    public static String doDistance(Request request, Response response) throws ClassNotFoundException, URISyntaxException, SQLException {
+    	String filePath = "resources/data/other-data/moviesG.txt";
+    	String delimiter = "/";
+    	Graph graph = new Graph(filePath, delimiter);
+    	String element1 = request.queryParams("Element1");
+    	String element2 = request.queryParams("Element2");
+    	String distance = distanceElements(graph, element1, element2);
+    	insert_distancia(connection, element1,  element2, distance);
+    	return distance;
+    }
+    
+    public static String doVecinos(Request request, Response response) throws ClassNotFoundException, URISyntaxException, SQLException {
+    	String filePath = "resources/data/other-data/moviesG.txt";
+    	String delimiter = "/";
+    	Graph graph = new Graph(filePath, delimiter);
+    	String element1 = request.queryParams("Element1");
+    	String vecinos = Vecinos(graph, element1);
+    	insert_vecinos(connection, element1,  vecinos );
+    	return vecinos;
+    }
+    
     public static String select(Connection conn, String table, String film) {
 	String sql = "SELECT * FROM " + table + " WHERE film=?";
 
 	String result = new String();
-	
+
 	try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 		pstmt.setString(1, film);
 		ResultSet rs = pstmt.executeQuery();
-                // Commit after query is executed
+		// Commit after query is executed
 		connection.commit();
 
 		while (rs.next()) {
-		    // read the result set
-		    result += "film = " + rs.getString("film") + "\n";
-		    System.out.println("film = "+rs.getString("film") + "\n");
+			// read the result set
+			result += "film = " + rs.getString("film") + "\n";
+			System.out.println("film = "+rs.getString("film") + "\n");
 
-		    result += "actor = " + rs.getString("actor") + "\n";
-		    System.out.println("actor = "+rs.getString("actor")+"\n");
+			result += "actor = " + rs.getString("actor") + "\n";
+			System.out.println("actor = "+rs.getString("actor")+"\n");
 		}
-	    } catch (SQLException e) {
-	    System.out.println(e.getMessage());
+	} catch (SQLException e) {
+		System.out.println(e.getMessage());
 	}
-	
+
 	return result;
     }
-    
     
     public static void insert(Connection conn, String film, String actor) {
 	String sql = "INSERT INTO films(film, actor) VALUES(?,?)";
@@ -103,74 +148,69 @@ public class Main {
 	    }
     }
     
-    public static void insert_actores_vecinos(Connection conn, String peticion, String vecino, String categoria) {
-        	
-        	String sql = "INSERT INTO Tabla_vecinos(peti, veci, categ) VALUES(?,?,?)";
 
-        	try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-        		pstmt.setString(1, peticion);
-        		pstmt.setString(2, vecino);
-        		pstmt.setString(3, categoria);
-        		pstmt.executeUpdate();
-        	    } catch (SQLException e) {
-        	    System.out.println(e.getMessage());
-        	}
-    }
-    
-    public static void insert_distancia(Connection conn, String peti1, String peti2, String dist) {
-    	String sql = "INSERT INTO Tabla_distancia(peti1, peti2,saltos,dist) VALUES(?,?,?,?)";
+    public static void insert_distancia(Connection conn, String elem1, String elem2, String result) throws SQLException {
+    	// Prepare SQL to create table
+    	Statement statement = connection.createStatement();
+    	// statement.setQueryTimeout(30); // set timeout to 30 sec.
+    	//statement.executeUpdate("drop table if exists Tabla_distancia");
+    	//statement.executeUpdate("create table Tabla_distancia (elem1 string, elem2 string ,result string)");
 
+    	String sql = "INSERT INTO Tabla_distancia (elem1 , elem2  ,result ) VALUES(?,?,?)";
     	try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-    		pstmt.setString(1, peti1);
-    		pstmt.setString(2, peti2);
-    	//	pstmt.setNString(3, graph);
-    		pstmt.setString(4, dist);
+    		pstmt.setString(1, elem1);
+    		pstmt.setString(2, elem2);
+    		pstmt.setString(3, result);
+    		pstmt.executeUpdate();
+    	} catch (SQLException e) {
+    		System.out.println(e.getMessage());
+    	}
+    }
+    public static void insert_vecinos(Connection conn, String peticion, String vecino) throws SQLException {
+    	// Prepare SQL to create table
+    	Statement statement = connection.createStatement();
+    	// statement.setQueryTimeout(30); // set timeout to 30 sec.
+    	//statement.executeUpdate("drop table if exists Tabla_vecinos");
+    	//statement.executeUpdate("create table Tabla_vecinos (peticion string, vecino string)");
+
+    	String sql = "INSERT INTO Tabla_vecinos (peticion , vecino ) VALUES(?,?)";
+    	try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    		pstmt.setString(1, peticion);
+    		pstmt.setString(2, vecino);
     		pstmt.executeUpdate();
     	} catch (SQLException e) {
     		System.out.println(e.getMessage());
     	}
     }
 
-    public static void insert_categoria(Connection conn, String categoria, String pelicula) {
-    	String sql = "INSERT INTO Tabla_categoria(categoria,pelicula) VALUES(?,?)";
 
-    	try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-    		pstmt.setString(1, categoria);
-    		pstmt.setString(2, pelicula);
-    		pstmt.executeUpdate();
-    	} catch (SQLException e) {
-    		System.out.println(e.getMessage());
-    	}
-    }
-    public static String doDistance(Request request, Response response) throws ClassNotFoundException, URISyntaxException {
-    	
-    	System.out.println("entro");
-    	String filePath = "data/other-data/tinyMovies.txt";
-    	String delimiter = "/";
-    	Graph graph = new Graph(filePath, delimiter);
-    	String element1 = request.queryParams("Element1");
-    	String element2 = request.queryParams("Element2");
-    	String distance = distanceBetweenElements(graph, element1, element2);
-    	System.out.println(distance);
-
-    	return select (connection, request.params(":table"), 
-                request.params(":Distance"));
-    	//return distance;
-    }
-
-    public static String Formu_Distancia(Request request, Response response) throws ClassNotFoundException, URISyntaxException {
-		String body = "<form action='/Distancia' method='post'>" +
+    public static String FormuDistancia(Request request, Response response)  throws ClassNotFoundException, URISyntaxException {
+		String body = "<form action='/Distance' method='post'>" +
 					  	  "<div>" + 
-					  	  	  "<label for='name'>Actor o película: </label>" +
-					  	  	  "<input type='text' id='name' name='1'/>" +
+					  	  	  "<label for='name'>Actor/película: </label>" +
+					  	  	  "<input type='text' id='name' name='Element1'/>" +
 					  	  "</div>" +
 					  	  "<div>" + 
-					  	  	  "<label for='name'>Actor o película: </label>" +
-					  	  	  "<input type='text' id='name' name='2'/>" +
+					  	  	  "<label for='name'>Actor/película: </label>" +
+					  	  	  "<input type='text' id='name' name='Element2'/>" +
 					  	  "</div>" +
 					  	  "<div class='button'>" +
-					  	  	  "<button type='submit'>DISTANCIA!</button>" +
+					  	  	  "<button type='submit'>¡DISTANCIA!</button>" +
 					  	  "</div>" +
+					  "</form>";
+		return body;
+    }
+    
+    
+    public static String FormuVecinos(Request request, Response response) throws ClassNotFoundException, URISyntaxException {
+		String body = "<form action='/vecinos' method='post'>" +
+					  	   "<div>" + 
+					  	   		"<label for='name'>Actor/película: </label>" +
+					  	   		"<input type='text' id='name' name='Element1'/>" +
+					  	   	"</div>" +
+					  	   	"<div class='button'>" +
+					  	   		"<button type='submit'>¿Qué vecinos tiene...?</button>" +
+					  	   	"</div>" +
 					  "</form>";
 		return body;
 }
@@ -186,7 +226,7 @@ public class Main {
 
 	// SQLite default is to auto-commit (1 transaction / statement execution)
         // Set it to false to improve performance
-	connection.setAutoCommit(false);
+	connection.setAutoCommit(true);
 
 
 	// In this case we use a Java 8 method reference to specify
@@ -194,18 +234,26 @@ public class Main {
 	// Main::doWork will return the result of the SQL select
 	// query. It could've been programmed using a lambda
 	// expression instead, as illustrated in the next sentence.
+	get("/upload_films", (req, res) -> 
+	"<form action='/upload' method='post' enctype='multipart/form-data'>" 
+	+ "    <input type='file' name='uploaded_films_file' accept='.txt'>"
+	+ "    <button>Upload file</button>" + "</form>");
+	
 	get("/:table/:film", Main::doSelect);
-	get("/Distancia", Main::Formu_Distancia);
 	
-	post("/Distancia", Main::Formu_Distancia);
+	get("/FormuDistancia", Main::FormuDistancia);
 	
-	post("/Distancia", Main::doDistance);
+	get("/FormuVecinos", Main::FormuVecinos);
+
+	
+	post("/FormuDistancia", Main::FormuDistancia);
+	post("/Distance", Main::doDistance);
+	
+	post("/FormuVecinos", Main::FormuVecinos);
+	post("/vecinos", Main::doVecinos);
 	// In this case we use a Java 8 Lambda function to process the
 	// GET /upload_films HTTP request, and we return a form
-	get("/upload_films", (req, res) -> 
-	    "<form action='/upload' method='post' enctype='multipart/form-data'>" 
-	    + "    <input type='file' name='uploaded_films_file' accept='.txt'>"
-	    + "    <button>Upload file</button>" + "</form>");
+	
 	// You must use the name "uploaded_films_file" in the call to
 	// getPart to retrieve the uploaded file. See next call:
 	get("/", (req, res) -> {
@@ -213,9 +261,9 @@ public class Main {
 				+ " <center><h1 style=\"color:#ff006c;\">PRACTICA FINAL ISI</h1> "
 				+ "<h2>Primero se cargan los archivos y luego podemos realizar las siguientes acciones: </h2><ul>"
 				+ "<li>Para cargar archivos:------------------------>/upload_films/</li>"
-				//+ "<li>Buscar los actores de una película--------->/vecinos/(Película)</li>"
-				+ "<li>Buscar las películas que tiene un actor---->/vecinos</li>"
-				+ "<li>Buscar la distancia entre dos elementos--->/Distancia</li>"
+				+ "<li>Buscar los actores de una película--------->/FormuVecinos</li>"
+				+ "<li>Buscar las películas que tiene un actor ---->/FormuVecinos</li>"
+				+ "<li>Buscar la distancia entre dos elementos--->/FormDistancia</li>"
 				+ /*"<li>Buscar la categoría de una pelicula-------->/categoria/(Película)</li>*/"</ul></center></body>";
 		System.out.println("Pag principal");
 		return pprin;
