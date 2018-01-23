@@ -1,13 +1,16 @@
 package urjc.isi.practica_final_isi;
 
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.sql.DriverManager;
 import java.sql.SQLException;
-
+import java.sql.Connection;
 import org.junit.*;
 import spark.Request;
 import spark.Response;
@@ -29,8 +32,15 @@ public class AppTest {
 	String movie = "";
 	Request request = null;
 	Response response = null;
+	private Connection connection;
 
-
+	@Test 
+	public void Test_Distancia() {
+		String actor1 = "Actor A";
+		String actor2 = "Actor H";
+		String resultado = "Actor A -> Movie 1 -> Actor H<br>Distancia: 2";
+		assertEquals( resultado, Main.distanceElements(graph,actor1, actor2));
+	}
 	// Esperamos que se eleve la exception, tenemos algun valor nulo
 	@Test(expected=NullPointerException.class)
 	public void TestDistance_NULO1() {
@@ -66,6 +76,8 @@ public class AppTest {
 		assertEquals(answer,Main.distanceElements(graph, actor1, actor2));
 
 	}
+	
+
 	public void testApp()
 	{
 		assertTrue( true );
