@@ -36,11 +36,18 @@ public class AppTest {
 		actor1 = null;
 		Main.distanceElements(graph, actor1, actor2);
 	}
-	
+
 	@Test(expected=NullPointerException.class)
 	public void TestDistance_NULO2() {
 		actor1 = null;
 		actor2 = null;
+		Main.distanceElements(graph, actor1, actor2);
+	}
+
+	// Grafo nulo
+	@Test(expected=NullPointerException.class)
+	public void TestDistance_NULOG() {
+		Graph graph = new Graph();
 		Main.distanceElements(graph, actor1, actor2);
 	}
 
