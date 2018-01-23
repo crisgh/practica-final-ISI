@@ -1,4 +1,8 @@
 language: java
+notifications:
+  email:
+  - mc.gallegoh@alumnos.urjc.es
+  - pedro.delasheras@urjc.es
 deploy:
   skip_cleanup: true
   provider: heroku
