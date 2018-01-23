@@ -27,7 +27,7 @@ public class Performer {
     public static void main(String[] args) {
         String filename  = args[0];
         String delimiter = args[1];
-        Graph graph = new Graph();
+        Graph graph = new Graph(filename,delimiter);
         In in = new In(filename);
         while (in.hasNextLine()) {
             String line = in.readLine();
