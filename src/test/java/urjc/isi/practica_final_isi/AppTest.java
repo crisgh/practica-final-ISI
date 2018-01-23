@@ -1,38 +1,44 @@
 package urjc.isi.practica_final_isi;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
-/**
- * Unit test for simple App.
- */
-public class AppTest 
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
-    }
+import static org.junit.Assert.*;
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
-    }
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
-    }
+import org.junit.*;
+import spark.Request;
+import spark.Response;
+
+public class AppTest {
+	/**
+	 * Unit test for simple App.
+	 */
+
+	/**
+	 *  Inicializamos los datos que se utilizan en los test
+	 */
+
+	String filePath = "resources/data/other-data/tinyMovies.txt";
+	String delimiter = "/";
+	Graph graph = new Graph(filePath, delimiter);	
+	String actor1 = "";
+	String actor2 = "";
+	String movie = "";
+	Request request = null;
+	Response response = null;
+
+
+	// Esperamos que se eleve la exception, tenemos algun valor nulo
+	@Test(expected=NullPointerException.class)
+	public void TestdistanceActors1() {
+		actor1 = null;
+		Main.distanceElements(graph, actor1, actor2);
+	}
+
+	public void testApp()
+	{
+		assertTrue( true );
+	}
 }
