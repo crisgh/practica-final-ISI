@@ -72,10 +72,18 @@ public class AppTest {
 		String actor1 = "Cristina";
 		String actor2 = "Actor A";
 		String answer = "No se han encontrado resultados para su búsqueda.</br>"
-					  + "Puede que haya introducido mal alguno de los elementos.";
+				+ "Puede que haya introducido mal alguno de los elementos.";
 		assertEquals(answer,Main.distanceElements(graph, actor1, actor2));
 
 	}
+
+	@Test(expected=NullPointerException.class)
+	public void TestVecinos() {
+		String result = "";
+		actor1 = null;
+		assertEquals(result, Main.Vecinos(graph, actor1));
+	}
+	
 	
 
 	public void testApp()
