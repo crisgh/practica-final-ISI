@@ -91,6 +91,12 @@ public class AppTest {
 		assertEquals(result, Main.Vecinos(graph, "Hill, Marianna"));
 	}
 
+	//Vecinos null
+	@Test(expected= NullPointerException.class)
+	public void doAInB1() throws ClassNotFoundException, URISyntaxException, SQLException {
+		Main.doVecinos(request, response);
+	}
+
 	public void testApp()
 	{
 		assertTrue( true );
