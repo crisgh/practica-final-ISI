@@ -32,8 +32,15 @@ public class AppTest {
 
 	// Esperamos que se eleve la exception, tenemos algun valor nulo
 	@Test(expected=NullPointerException.class)
-	public void TestdistanceActors1() {
+	public void TestDistance_NULO1() {
 		actor1 = null;
+		Main.distanceElements(graph, actor1, actor2);
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void TestDistance_NULO2() {
+		actor1 = null;
+		actor2 = null;
 		Main.distanceElements(graph, actor1, actor2);
 	}
 
