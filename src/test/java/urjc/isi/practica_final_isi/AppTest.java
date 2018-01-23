@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.sql.SQLException;
 
 import org.junit.*;
 import spark.Request;
@@ -50,6 +51,11 @@ public class AppTest {
 		Graph graph = new Graph();
 		Main.distanceElements(graph, actor1, actor2);
 	}
+	// Distancia null
+	@Test (expected=NullPointerException.class)
+	public void Test_doDistancia() throws ClassNotFoundException, URISyntaxException, SQLException {
+		Main.doDistance(request, response);
+} 
 
 	public void testApp()
 	{
