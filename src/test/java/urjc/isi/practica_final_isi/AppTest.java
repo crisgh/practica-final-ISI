@@ -55,8 +55,17 @@ public class AppTest {
 	@Test (expected=NullPointerException.class)
 	public void Test_doDistancia() throws ClassNotFoundException, URISyntaxException, SQLException {
 		Main.doDistance(request, response);
-} 
+	} 
+	//Elemento NO_FOUND
+	@Test()
+	public void TestdistanceActors6() {
+		String element1 = "Cristina";
+		String element2 = "Actor A";
+		String answer = "No se han encontrado resultados para su búsqueda.</br>"
+					  + "Puede que haya introducido mal alguno de los elementos.";
+		assertEquals(answer,Main.distanceElements(graph, element1, element2));
 
+	}
 	public void testApp()
 	{
 		assertTrue( true );
