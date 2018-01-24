@@ -4,7 +4,6 @@ import static spark.Spark.port;
 import static spark.Spark.post;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
@@ -17,8 +16,6 @@ import java.sql.Statement;
 import java.util.StringTokenizer;
 
 import javax.servlet.MultipartConfigElement;
-import javax.servlet.ServletException;
-
 import spark.Request;
 import spark.Response;
 
@@ -151,7 +148,7 @@ public class Main {
 
 	public static void insert_distancia(Connection conn, String elem1, String elem2, String result) throws SQLException {
 		// Prepare SQL to create table
-		Statement statement = connection.createStatement();
+		//Statement statement = connection.createStatement();
 		// statement.setQueryTimeout(30); // set timeout to 30 sec.
 		//statement.executeUpdate("drop table if exists Tabla_distancia");
 		//statement.executeUpdate("create table Tabla_distancia (elem1 string, elem2 string ,result string)");
@@ -168,7 +165,7 @@ public class Main {
 	}
 	public static void insert_vecinos(Connection conn, String peticion, String vecino) throws SQLException {
 		// Prepare SQL to create table
-		Statement statement = connection.createStatement();
+		//Statement statement = connection.createStatement();
 		// statement.setQueryTimeout(30); // set timeout to 30 sec.
 		//statement.executeUpdate("drop table if exists Tabla_vecinos");
 		//statement.executeUpdate("create table Tabla_vecinos (peticion string, vecino string)");
