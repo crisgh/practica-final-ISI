@@ -1,7 +1,6 @@
 package urjc.isi.practica_final_isi;
-
-
 import static org.junit.Assert.assertEquals;
+
 import static org.junit.Assert.assertTrue;
 
 import static org.junit.Assert.*;
@@ -86,17 +85,40 @@ public class AppTest {
 
 	@Test()
 	public void TestVecinos_NOFOUND() {
-		String result = "No se han encontrado resultados para 'Hill, Marianna'";
+		String result = "No se han encontrado resultados para 'Gallego, Cristina'";
 		graph = new Graph();
-		assertEquals(result, Main.Vecinos(graph, "Hill, Marianna"));
+		assertEquals(result, Main.Vecinos(graph, "Gallego, Cristina"));
 	}
-
+	
 	//Vecinos null
 	@Test(expected= NullPointerException.class)
-	public void doVecinos() throws ClassNotFoundException, URISyntaxException, SQLException {
+	public void Test_doVecinos() throws ClassNotFoundException, URISyntaxException, SQLException {
 		Main.doVecinos(request, response);
 	}
-
+	//Request, response son null
+	@Test (expected=NullPointerException.class)
+	public void Test_Vecinos_RequestResponse() throws ClassNotFoundException, URISyntaxException, SQLException {
+		Main.doDistance(request, response);
+}
+	@Test 
+	public void Test_Insert_Distancia() throws SQLException {
+		connection = DriverManager.getConnection("jdbc:sqlite:sample.db");
+		String elem1 = "Wilson, Debra (I)";
+		String elem2 = null;
+		String distancia = "2";
+		Integer result = 1;
+		assertEquals(result,Main.insert_distancia(connection, elem1, elem2, distancia));
+	} 
+	
+	//No tiene vecinos
+	@Test 
+	public void Test_Insert_Vecinos() throws SQLException {
+		connection = DriverManager.getConnection("jdbc:sqlite:sample.db");
+		String peticion = "Olson, Sandra";
+		String element2 = "Cristina";
+		Integer resultado = 0;
+		assertEquals(resultado, Main.insert_vecinos(connection, peticion,element2));
+} 
 	public void testApp()
 	{
 		assertTrue( true );
