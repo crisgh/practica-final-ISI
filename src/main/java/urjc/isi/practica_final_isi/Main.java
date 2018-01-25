@@ -146,7 +146,7 @@ public class Main {
 	}
 
 
-	public static void insert_distancia(Connection conn, String elem1, String elem2, String result) throws SQLException {
+	public static Integer insert_distancia(Connection conn, String elem1, String elem2, String result) throws SQLException {
 		// Prepare SQL to create table
 		//Statement statement = connection.createStatement();
 		// statement.setQueryTimeout(30); // set timeout to 30 sec.
@@ -154,16 +154,21 @@ public class Main {
 		//statement.executeUpdate("create table Tabla_distancia (elem1 string, elem2 string ,result string)");
 
 		String sql = "INSERT INTO Tabla_distancia (elem1 , elem2  ,result ) VALUES(?,?,?)";
-		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-			pstmt.setString(1, elem1);
-			pstmt.setString(2, elem2);
-			pstmt.setString(3, result);
-			pstmt.executeUpdate();
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
+		if (elem1 == null || elem2 == null){
+			return 1;
+		}else{
+			try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+				pstmt.setString(1, elem1);
+				pstmt.setString(2, elem2);
+				pstmt.setString(3, result);
+				pstmt.executeUpdate();
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+			return 0;
+		}	
 	}
-	public static void insert_vecinos(Connection conn, String peticion, String vecino) throws SQLException {
+	public static Integer insert_vecinos(Connection conn, String peticion, String vecino) throws SQLException {
 		// Prepare SQL to create table
 		//Statement statement = connection.createStatement();
 		// statement.setQueryTimeout(30); // set timeout to 30 sec.
@@ -171,12 +176,17 @@ public class Main {
 		//statement.executeUpdate("create table Tabla_vecinos (peticion string, vecino string)");
 
 		String sql = "INSERT INTO Tabla_vecinos (peticion , vecino ) VALUES(?,?)";
-		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-			pstmt.setString(1, peticion);
-			pstmt.setString(2, vecino);
-			pstmt.executeUpdate();
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+		if (peticion == null || vecino == null){
+			return 1 ;
+		}else{
+			try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+				pstmt.setString(1, peticion);
+				pstmt.setString(2, vecino);
+				pstmt.executeUpdate();
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+			return 0;
 		}
 	}
 
