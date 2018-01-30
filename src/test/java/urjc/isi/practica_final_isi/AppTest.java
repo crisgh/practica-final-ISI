@@ -100,6 +100,14 @@ public class AppTest {
 		Main.pelicula(pelicula);
 	}
 
+	@Test
+	public void test_Metodo_In() {
+		In in = new In(filePath);
+		while(in.hasNextLine()) {
+			in.readLine();
+		}
+		assertEquals(null, in.readLine());
+	}
 	//No existe la pelicula
 	@Test() 
 	public void test_Categorias_peliculas_noFound() {

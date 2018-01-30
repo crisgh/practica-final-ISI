@@ -208,9 +208,9 @@ public class Main {
 	}
 
 
-	public static String select(Connection conn, String table, String film) {
+	public static String select(Connection conn, String film,  String table) {
 		String sql = "SELECT * FROM " + table + " WHERE film=?";
-
+		System.out.println(sql);
 		String result = new String();
 
 		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -221,8 +221,8 @@ public class Main {
 
 			while (rs.next()) {
 				// read the result set
-				result += "film = " + rs.getString("film") + "\n";
-				System.out.println("film = "+rs.getString("film") + "\n");
+				result += "film = " + rs.getString(film) + "\n";
+				System.out.println("film = "+rs.getString(film) + "\n");
 
 				result += "actor = " + rs.getString("actor") + "\n";
 				System.out.println("actor = "+rs.getString("actor")+"\n");
@@ -230,6 +230,7 @@ public class Main {
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
+		System.out.println("result: " + result);
 
 		return result;
 	}
@@ -298,18 +299,21 @@ public class Main {
 		//		statement.executeUpdate("drop table if exists Tabla_categorias");
 		//		statement.executeUpdate("create table Tabla_categorias (film string, categorias string)");
 		//String sql = "CREATE table Tabla_categorias (film string, categorias string)";
-
-		String sql = "INSERT INTO Tabla_categorias(film, categorias) VALUES(?,?)";
-
-		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-			pstmt.setString(1, film);
-			pstmt.setString(2, categorias);
-			pstmt.executeUpdate();
-			return true;
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
-		return false;
+		String OK = select(conn, film,"Tabla_categorias");
+	
+			String sql = "INSERT INTO Tabla_categorias(film, categorias) VALUES(?,?)";
+	
+			try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+				pstmt.setString(1, film);
+				pstmt.setString(2, categorias);
+				pstmt.executeUpdate();
+				return true;
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+			return false;
+		
+		
 	}
 
 	public static String FormuDistancia(Request request, Response response)  throws ClassNotFoundException, URISyntaxException {
@@ -443,8 +447,8 @@ public class Main {
 					+ "<li>Buscar los actores de una película------------>/FormuVecinos</li>"
 					+ "<li>Buscar las películas que tiene un actor ---->/FormuVecinos</li>"
 					+ "<li>Buscar la distancia entre dos elementos--->/FormuDistancia</li>"
-					+ "<li>Peliculas de una categoria--->/FormuCategorias</li>"
-					+ "<li>Categoria del elemento--->/FormuCPelicula</li>"
+					+ "<li>Peliculas de una categoria------->/FormuCategorias</li>"
+					+ "<li>Categoria del elemento----------->/FormuCPelicula</li>"
 					+ "</center></body>";
 			System.out.println("Pag principal");
 			return pprin;
