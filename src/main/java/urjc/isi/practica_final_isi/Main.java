@@ -55,6 +55,30 @@ public class Main {
 		return result;
 	}
 
+	public static String peliculas(String categoria) {
+		if (categoria == null) {
+			throw new NullPointerException("categoria null");
+		}
+		In in;
+		String result = "";
+		if ("Cat_Nula".equals(categoria)) {
+			result = "Necesita seleccinar una categoria.";
+		} else {
+			try {
+				String path = "resources/data/imdb-data/cast." + categoria + ".txt";
+				in = new In(path);
+				while (!in.isEmpty()) {
+					String line = in.readLine();				    	//Leo linea a linea (cada linea es una película)
+					String[] parts = line.split("/");					//Hago un split hasta la primera /
+					result += (parts[0]) + "<br>";					//Concateno todas las películas
+				}
+			}
+			catch (IllegalArgumentException e) {
+				throw new IllegalArgumentException("Error al abrir el archivo");
+			}
+		}
+		return result;
+	}
 
 	//Para saber si esta un elemento en otro
 	public static String Vecinos(Graph graph, String element) {
@@ -76,6 +100,65 @@ public class Main {
 		return result;
 	}
 
+	public static String pelicula(String pelicula) {
+		if (pelicula == null) {
+			throw new NullPointerException("Movie null");
+		}
+
+		String[] docs = {"cast.00-06.txt", "cast.06.txt", "cast.action.txt","cast.G.txt", "cast.mpaa.txt", "cast.PG.txt","cast.PG13.txt", "cast.rated.txt"};
+		String categorias = new String();
+		String categoria = new String();
+		In in;
+		try {
+			for (int i = 0; i < docs.length; i++) {
+				in = new In("resources/data/imdb-data/" + docs[i]);
+				String Documento = in.readAll(); // Pasa por todos los ficheros que haya en la carpeta origen
+				if(Documento.contains(pelicula)) { // busqueda en los archivos que contenga
+					switch (docs[i]) {
+					case "cast.00-06.txt": 
+						categoria = "Movies release since 2000";
+						break;
+					case "cast.06.txt": 
+						categoria = "Movies release in 2006";
+						break;
+					case "cast.action.txt": 
+						categoria = "Action Movies";
+						break;
+					case "cast.all.txt": 
+						categoria = "All Movies";
+						break;
+					case "cast.G.txt": 
+						categoria = "Movies rated G by MPAA";
+						break;
+					case "cast.mpaa.txt": 
+						categoria = "Movies rated by MPAA";
+						break;
+					case "cast.PG13.txt": 
+						categoria = "Movies rated PG13 by MPAA";
+						break;
+					case "cast.PG.txt": 
+						categoria = "Movies rated PG by MPAA";
+						break;
+					case "cast.rated.txt": 
+						categoria = "Popular Movies";
+						break;
+					default: 
+						categoria = "NOT FOUND";
+						break;
+					}
+					categorias += categoria + "<br>";
+				}
+				in.close();
+			}
+
+			if (categorias.isEmpty()) {
+				categorias = "No se han encontrado resultados para '" + pelicula + "'";
+			}
+		}catch(IllegalArgumentException e) {
+			throw new IllegalArgumentException();
+		}
+		return categorias;
+	}
 
 
 	// Used to illustrate how to route requests to methods instead of
@@ -106,6 +189,24 @@ public class Main {
 		insert_vecinos(connection, element1,  vecinos );
 		return vecinos;
 	}
+
+	public static String doCategorias(Request request, Response response) throws ClassNotFoundException, URISyntaxException, SQLException {
+		String categoria = request.queryParams("Categoria");
+		System.out.println("categoria " + categoria);
+		String peliculas = peliculas(categoria);
+		System.out.println("peliculas  " + peliculas);
+		insert_categoria(connection,peliculas,categoria);
+		return peliculas;
+	}
+	public static String doCategoriaPeli(Request request, Response response) throws ClassNotFoundException, URISyntaxException, SQLException {
+		String pelicula = request.queryParams("movie");
+		System.out.println("pelicula:  " + pelicula);
+		String categoria = pelicula(pelicula);
+		System.out.println("categoria " + categoria);
+		insert_categoria(connection,pelicula,categoria);
+		return categoria;
+	}
+
 
 	public static String select(Connection conn, String table, String film) {
 		String sql = "SELECT * FROM " + table + " WHERE film=?";
@@ -149,7 +250,7 @@ public class Main {
 	public static Integer insert_distancia(Connection conn, String elem1, String elem2, String result) throws SQLException {
 		// Prepare SQL to create table
 		//Statement statement = connection.createStatement();
-		// statement.setQueryTimeout(30); // set timeout to 30 sec.
+		//statement.setQueryTimeout(30); // set timeout to 30 sec.
 		//statement.executeUpdate("drop table if exists Tabla_distancia");
 		//statement.executeUpdate("create table Tabla_distancia (elem1 string, elem2 string ,result string)");
 
@@ -170,10 +271,10 @@ public class Main {
 	}
 	public static Integer insert_vecinos(Connection conn, String peticion, String vecino) throws SQLException {
 		// Prepare SQL to create table
-		//Statement statement = connection.createStatement();
-		// statement.setQueryTimeout(30); // set timeout to 30 sec.
-		//statement.executeUpdate("drop table if exists Tabla_vecinos");
-		//statement.executeUpdate("create table Tabla_vecinos (peticion string, vecino string)");
+		//		Statement statement = connection.createStatement();
+		//		statement.setQueryTimeout(30); // set timeout to 30 sec.
+		//		statement.executeUpdate("drop table if exists Tabla_vecinos");
+		//		statement.executeUpdate("create table Tabla_vecinos (peticion string, vecino string)");
 
 		String sql = "INSERT INTO Tabla_vecinos (peticion , vecino ) VALUES(?,?)";
 		if (peticion == null || vecino == null){
@@ -190,6 +291,26 @@ public class Main {
 		}
 	}
 
+	public static boolean insert_categoria(Connection conn, String film, String categorias) throws SQLException {
+		// Prepare SQL to create table
+		Statement statement = connection.createStatement();
+		statement.setQueryTimeout(30); // set timeout to 30 sec.
+		//		statement.executeUpdate("drop table if exists Tabla_categorias");
+		//		statement.executeUpdate("create table Tabla_categorias (film string, categorias string)");
+		//String sql = "CREATE table Tabla_categorias (film string, categorias string)";
+
+		String sql = "INSERT INTO Tabla_categorias(film, categorias) VALUES(?,?)";
+
+		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setString(1, film);
+			pstmt.setString(2, categorias);
+			pstmt.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return false;
+	}
 
 	public static String FormuDistancia(Request request, Response response)  throws ClassNotFoundException, URISyntaxException {
 		String body = "<form action='/Distance' method='post'>" +
@@ -214,6 +335,55 @@ public class Main {
 				"</div>" +
 				"</form>";
 		return body;
+	}
+
+	public static String FormuCategorias(Request request, Response response) throws ClassNotFoundException, URISyntaxException {
+		String body = "<form action='/Categorias' method='post'>" +
+				"<div>" + 
+				"<select name='Categoria'>\n\t<option selected value=Cat_Nula>Selecciona la categoria</option>" +
+				"<option value=00-06>Movies released since 2000</option>" +
+				"<option value=06>Movies release in 2006</option>" +
+				"<option value=action>Action Movies</option>" +
+				"<option value=all>all the movies</option>" +
+				"<option value=G>Movies G by MPAA</option>" +
+				"<option value=mpaa>Movies by MPAA</option>" +
+				"<option value=PG13>Movies PG13 by MPAA</option>" +
+				"<option value=PG>Movies PG by MPAA</option>" +
+				"<option value=rated>Popular Movies</option>" +
+				"</select><input class='button' type='submit' value='Buscar'>"+
+				"</div>" +
+				"</form>";
+		return body;
+	}
+
+	public static String FormuCategoriaPeli(Request request, Response response) throws ClassNotFoundException, URISyntaxException {
+		String body = "<form action='/pelicula' method='post'>" +
+				"<div>" + 
+				"<label for='name'>Película: </label>" +
+				"<input type='text' id='name' name='movie'/>" +
+				"<button type='submit'>¿Qué categoría es...?</button>" +
+				"</div>" +
+				"</form>";
+		return body;
+	}
+	public static String select(String film) {
+		String sql = "SELECT * FROM films WHERE films.film=?";
+		String result = new String();
+		try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+			pstmt.setString(1, film);
+			ResultSet rs = pstmt.executeQuery();
+			rs.next();
+			result += rs.getString("categorias") + "<br/>";
+			if (rs.getString("categorias").isEmpty()) {
+				result = "No se han encontrado categorías para la película '" + film + "'";
+			}
+		}catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		if (result.isEmpty()) {
+			result = "La película '" + film + "' no se encuentra en nuestra base de datos";
+		}
+		return result;
 	}
 
 	public static void main(String[] args) throws 
@@ -243,8 +413,9 @@ public class Main {
 		get("/:table/:film", Main::doSelect);
 
 		get("/FormuDistancia", Main::FormuDistancia);
-
 		get("/FormuVecinos", Main::FormuVecinos);
+		get("/FormuCategorias",Main::FormuCategorias);
+		get("/FormuCPelicula", Main::FormuCategoriaPeli);
 
 
 		post("/FormuDistancia", Main::FormuDistancia);
@@ -252,6 +423,13 @@ public class Main {
 
 		post("/FormuVecinos", Main::FormuVecinos);
 		post("/vecinos", Main::doVecinos);
+
+		post("/FormuCategorias",Main::FormuCategorias);
+		post("/Categorias",Main::doCategorias);
+
+		post("/FormuCPelicula", Main::FormuCategoriaPeli);
+		post("/pelicula",Main::doCategoriaPeli);
+
 		// In this case we use a Java 8 Lambda function to process the
 		// GET /upload_films HTTP request, and we return a form
 
@@ -265,6 +443,8 @@ public class Main {
 					+ "<li>Buscar los actores de una película------------>/FormuVecinos</li>"
 					+ "<li>Buscar las películas que tiene un actor ---->/FormuVecinos</li>"
 					+ "<li>Buscar la distancia entre dos elementos--->/FormuDistancia</li>"
+					+ "<li>Peliculas de una categoria--->/FormuCategorias</li>"
+					+ "<li>Categoria del elemento--->/FormuCPelicula</li>"
 					+ "</center></body>";
 			System.out.println("Pag principal");
 			return pprin;

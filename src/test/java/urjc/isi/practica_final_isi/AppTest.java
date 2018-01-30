@@ -28,7 +28,8 @@ public class AppTest {
 	Graph graph = new Graph(filePath, delimiter);	
 	String actor1 = "";
 	String actor2 = "";
-	String movie = "";
+	String pelicula = "";
+	String categoria = "";
 	Request request = null;
 	Response response = null;
 	private Connection connection;
@@ -89,7 +90,48 @@ public class AppTest {
 		graph = new Graph();
 		assertEquals(result, Main.Vecinos(graph, "Gallego, Cristina"));
 	}
-	
+
+
+
+	//El nombre de la película es null
+	@Test(expected=NullPointerException.class)
+	public void testCategoria_peliculas() {
+		pelicula = null;
+		Main.pelicula(pelicula);
+	}
+
+	//No existe la pelicula
+	@Test() 
+	public void test_Categorias_peliculas_noFound() {
+		String pelicula = "Mi Gran peli";
+		String answer = "No se han encontrado resultados para '" + pelicula + "'";
+		assertEquals(answer,Main.pelicula(pelicula));
+	}
+
+	//La categoría es null
+	@Test(expected=NullPointerException.class)
+	public void test_CategoriaPeli() {
+		categoria = null;
+		Main.peliculas(categoria);
+	}
+
+	//La categoría no existe 
+	@Test(expected=IllegalArgumentException.class)
+	public void test_Categoria_NOFOUND() {
+		categoria = " Categoria Cristina";
+		Main.peliculas(categoria);
+	}
+
+
+	//Se selecciona la opción elige una categoría, FLUJO--> Entra en el segundo if
+	@Test()
+	public void Test_NO_Categoria() {
+		String categoria = "Cat_Nula";
+		String answer = "Necesita seleccinar una categoria.";
+		assertEquals(answer, Main.peliculas(categoria));
+	}
+
+
 	//Vecinos null
 	@Test(expected= NullPointerException.class)
 	public void Test_doVecinos() throws ClassNotFoundException, URISyntaxException, SQLException {
@@ -99,7 +141,20 @@ public class AppTest {
 	@Test (expected=NullPointerException.class)
 	public void Test_Vecinos_RequestResponse() throws ClassNotFoundException, URISyntaxException, SQLException {
 		Main.doDistance(request, response);
-}
+	}
+
+
+	//Categorias null
+	@Test(expected= NullPointerException.class)
+	public void doCategorias() throws ClassNotFoundException, URISyntaxException, SQLException {
+		Main.doCategorias(request, response);
+	}
+
+	//Request and Response null
+	@Test(expected= NullPointerException.class)
+	public void doCategoriaPeli() throws ClassNotFoundException, URISyntaxException, SQLException {
+		Main.doCategoriaPeli(request, response);
+	}
 	@Test 
 	public void Test_Insert_Distancia() throws SQLException {
 		connection = DriverManager.getConnection("jdbc:sqlite:sample.db");
@@ -109,7 +164,7 @@ public class AppTest {
 		Integer result = 1;
 		assertEquals(result,Main.insert_distancia(connection, elem1, elem2, distancia));
 	} 
-	
+
 	//No tiene vecinos
 	@Test 
 	public void Test_Insert_Vecinos() throws SQLException {
@@ -118,7 +173,16 @@ public class AppTest {
 		String element2 = "Cristina";
 		Integer resultado = 0;
 		assertEquals(resultado, Main.insert_vecinos(connection, peticion,element2));
-} 
+	} 
+
+
+	public void Test_Insert_Categorias() throws SQLException {
+		connection = DriverManager.getConnection("jdbc:sqlite:sample.db");
+		String categoria = "Action Movies";
+		String film = "Mi gran Peli";
+		assertFalse( Main.insert_categoria(connection,film,categoria));
+	} 
+
 	public void testApp()
 	{
 		assertTrue( true );
